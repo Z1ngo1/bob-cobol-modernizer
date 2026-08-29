@@ -216,6 +216,8 @@ def generate_task_readme(task: TaskInfo, out_dir: Path) -> Path:
     if task.jcl_defaix:   jcl_lines.append("- DEFAIX  (IDCAMS DEFINE AIX)")
     if task.jcl_defgdg:   jcl_lines.append("- DEFGDG  (IDCAMS DEFINE GDG)")
     if task.jcl_dsqqmfe:  jcl_lines.append("- DSQQMFE (QMF batch executor)")
+    for label in sorted(task.jcl_compile_jobs):
+        jcl_lines.append(f"- {label}")
     jcl_md = "\n".join(jcl_lines) if jcl_lines else "- N/A"
 
     # Pre-compute every value (including the boolean Yes/No flags) BEFORE
