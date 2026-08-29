@@ -20,6 +20,7 @@ Task folder: `TASKS/TASK29-ESDS-OPR-LOG-RECON/`
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
 - DEFESDS (IDCAMS DEFINE CLUSTER ... NONINDEXED)
+- COBDB2CP (Full COBOL + DB2 compile-and-run pipeline: deletes old output → compiles with DB2 precompile via DB2CBL procedure → runs the bound program under IKJEFT01.)
 
 ---
 

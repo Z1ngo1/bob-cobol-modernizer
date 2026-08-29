@@ -14,7 +14,7 @@ Task folder: `TASKS/TASK12-CONTROL-BREAK-REPORT/`
 
 ### JCL Infrastructure Detected
 
-- N/A
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

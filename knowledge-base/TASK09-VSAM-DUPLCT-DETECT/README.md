@@ -17,6 +17,7 @@ Task folder: `TASKS/TASK09-VSAM-DUPLCT-DETECT/`
 ### JCL Infrastructure Detected
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

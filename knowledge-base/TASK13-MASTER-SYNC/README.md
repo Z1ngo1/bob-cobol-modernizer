@@ -14,7 +14,7 @@ Task folder: `TASKS/TASK13-MASTER-SYNC/`
 
 ### JCL Infrastructure Detected
 
-- N/A
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

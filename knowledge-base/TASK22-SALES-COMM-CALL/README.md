@@ -15,7 +15,7 @@ Task folder: `TASKS/TASK22-SALES-COMM-CALL/`
 
 ### JCL Infrastructure Detected
 
-- N/A
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

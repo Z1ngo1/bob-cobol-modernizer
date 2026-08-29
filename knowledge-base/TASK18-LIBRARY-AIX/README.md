@@ -18,6 +18,9 @@ Task folder: `TASKS/TASK18-LIBRARY-AIX/`
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
 - DEFAIX  (IDCAMS DEFINE AIX)
+- BLDINDX (Populates an Alternate Index with key values and pointers from the base KSDS cluster.)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
+- DEFPATH (Defines a PATH that connects an Alternate Index (AIX) to its base KSDS cluster.)
 
 ---
 

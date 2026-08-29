@@ -17,6 +17,7 @@ Task folder: `TASKS/TASK23-VSAM-CREDIT-APPROVAL/`
 ### JCL Infrastructure Detected
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

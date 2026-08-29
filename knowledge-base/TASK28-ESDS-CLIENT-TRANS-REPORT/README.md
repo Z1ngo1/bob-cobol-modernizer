@@ -18,6 +18,7 @@ Task folder: `TASKS/TASK28-ESDS-CLIENT-TRANS-REPORT/`
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
 - DEFESDS (IDCAMS DEFINE CLUSTER ... NONINDEXED)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

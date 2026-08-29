@@ -16,7 +16,7 @@ Task folder: `TASKS/TASK19-DB2-BULK-INSERT/`
 
 ### JCL Infrastructure Detected
 
-- N/A
+- COBDB2CP (Full COBOL + DB2 compile-and-run pipeline: deletes old output → compiles with DB2 precompile via DB2CBL procedure → runs the bound program under IKJEFT01.)
 
 ---
 

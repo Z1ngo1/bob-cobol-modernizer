@@ -14,7 +14,7 @@ Task folder: `TASKS/TASK16-BINARY-SEARCH/`
 
 ### JCL Infrastructure Detected
 
-- N/A
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

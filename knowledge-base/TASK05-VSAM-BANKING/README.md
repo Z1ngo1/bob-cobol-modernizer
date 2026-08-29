@@ -16,6 +16,7 @@ Task folder: `TASKS/TASK05-VSAM-BANKING/`
 ### JCL Infrastructure Detected
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 

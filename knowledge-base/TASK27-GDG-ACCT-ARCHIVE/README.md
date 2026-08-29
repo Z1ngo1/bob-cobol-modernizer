@@ -18,6 +18,7 @@ Task folder: `TASKS/TASK27-GDG-ACCT-ARCHIVE/`
 
 - DEFKSDS (IDCAMS DEFINE CLUSTER ... INDEXED)
 - DEFGDG  (IDCAMS DEFINE GDG)
+- COMPRUN (Combines compile and run in a single job using a MYCOMPGO catalogued procedure.)
 
 ---
 
