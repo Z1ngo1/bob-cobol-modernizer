@@ -77,6 +77,12 @@ class TaskInfo:
     jcl_defgdg: bool = False
     jcl_dsqqmfe: bool = False   # QMF batch executor
 
+    # Compile/run/proc JCL members that carry no IDCAMS DEFINE of their own
+    # (e.g. COMPRUN, COBDB2CP, DB2PROC) — tracked separately so the
+    # "JCL Infrastructure Detected" section isn't left at N/A for tasks
+    # whose only JCL is a plain compile-and-run or DB2 precompile job.
+    jcl_compile_jobs: list[str] = field(default_factory=list)
+
     # Derived
     group: str = ""             # A–I, filled by classifier
     group_label: str = ""
@@ -199,7 +205,59 @@ def _parse_cbl(path: Path) -> ProgramInfo:
 # JCL scanner
 # ---------------------------------------------------------------------------
 
-def _scan_jcl(folder: Path, task: TaskInfo) -> None:
+# Matches "### [NAME.jcl](./NAME.jcl)" followed by its description paragraph
+# (everything up to the next blank line) in JCL SAMPLES/README.md.
+_JCL_CATALOG_ENTRY_RE = re.compile(
+    r'###\s+\[([\w.]+)\]\([^)]*\)\n(.+?)\n\n', re.DOTALL
+)
+
+
+def _load_jcl_catalog(tasks_root: Path) -> dict[str, str]:
+    """
+    Read the project's `JCL SAMPLES/README.md` (a sibling of TASKS/) and
+    build a {FILENAME_STEM: one-line description} catalog. This lets the
+    report generator describe *any* JCL member that has a matching sample
+    documented there -- new sample types are picked up automatically,
+    with nothing to hard-code here.
+
+    Returns {} if the samples README can't be found or parsed; callers
+    must treat that as "no catalog available" rather than an error.
+    """
+    candidates = [
+        tasks_root.parent / "JCL SAMPLES" / "README.md",
+        tasks_root.parent.parent / "JCL SAMPLES" / "README.md",
+    ]
+    readme_path = next((c for c in candidates if c.exists()), None)
+    if readme_path is None:
+        return {}
+
+    try:
+        text = readme_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return {}
+
+    catalog: dict[str, str] = {}
+    for m in _JCL_CATALOG_ENTRY_RE.finditer(text):
+        filename = m.group(1)            # e.g. "COBDB2CP.jcl"
+        stem = Path(filename).stem.upper()
+
+        raw_desc = m.group(2)
+        # Collapse the (possibly multi-line, markdown-hard-break) paragraph
+        # into a single line.
+        desc = re.sub(r'\s*\n\s*', ' ', raw_desc).strip()
+        # Keep just the first sentence so the JCL bullet stays one line,
+        # matching the style of the content-detected DEFKSDS/DEFGDG bullets.
+        desc = re.split(r'(?<=\.)\s', desc, maxsplit=1)[0]
+        # Strip Markdown emphasis/links for a clean plain-text bullet.
+        desc = re.sub(r'\*\*(.+?)\*\*', r'\1', desc)
+        desc = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', desc)
+
+        catalog[stem] = desc
+
+    return catalog
+
+
+def _scan_jcl(folder: Path, task: TaskInfo, jcl_catalog: dict[str, str]) -> None:
     """Read all .jcl files in the task folder tree and set JCL signal flags."""
     for jcl_path in folder.rglob("*.jcl"):
         try:
@@ -208,20 +266,42 @@ def _scan_jcl(folder: Path, task: TaskInfo) -> None:
             continue
 
         # IDCAMS DEFINE CLUSTER … INDEXED  →  KSDS
-        if re.search(r'DEFINE\s+CLUSTER\b.*INDEXED', text, re.DOTALL):
+        matched_defksds = bool(re.search(r'DEFINE\s+CLUSTER\b.*INDEXED', text, re.DOTALL))
+        if matched_defksds:
             task.jcl_defksds = True
         # IDCAMS DEFINE CLUSTER … NONINDEXED  →  ESDS
-        if re.search(r'DEFINE\s+CLUSTER\b.*NONINDEXED', text, re.DOTALL):
+        matched_defesds = bool(re.search(r'DEFINE\s+CLUSTER\b.*NONINDEXED', text, re.DOTALL))
+        if matched_defesds:
             task.jcl_defesds = True
         # DEFINE AIX
-        if re.search(r'DEFINE\s+AIX\b', text):
+        matched_defaix = bool(re.search(r'DEFINE\s+AIX\b', text))
+        if matched_defaix:
             task.jcl_defaix = True
         # DEFINE GDG
-        if re.search(r'DEFINE\s+GDG\b', text):
+        matched_defgdg = bool(re.search(r'DEFINE\s+GDG\b', text))
+        if matched_defgdg:
             task.jcl_defgdg = True
         # QMF batch executor
-        if 'DSQQMFE' in text:
+        matched_dsqqmfe = 'DSQQMFE' in text
+        if matched_dsqqmfe:
             task.jcl_dsqqmfe = True
+
+        # If this specific file didn't already trigger one of the
+        # content-based signals above, fall back to the JCL SAMPLES
+        # catalog (matched by filename) so plain compile/run/DB2-proc
+        # jobs still get a description instead of leaving the section
+        # at N/A.
+        already_described = (
+            matched_defksds or matched_defesds or matched_defaix
+            or matched_defgdg or matched_dsqqmfe
+        )
+        if not already_described:
+            stem = jcl_path.stem.upper()
+            desc = jcl_catalog.get(stem)
+            if desc:
+                label = f"{jcl_path.stem} ({desc})"
+                if label not in task.jcl_compile_jobs:
+                    task.jcl_compile_jobs.append(label)
 
 
 # ---------------------------------------------------------------------------
@@ -247,6 +327,10 @@ def parse_tasks(tasks_root: Path) -> list[TaskInfo]:
     """
     tasks: list[TaskInfo] = []
 
+    # Load the JCL SAMPLES catalog once (not per-task) -- it's the same
+    # for every task in the run.
+    jcl_catalog = _load_jcl_catalog(tasks_root)
+
     for entry in sorted(tasks_root.iterdir()):
         if not entry.is_dir():
             continue
@@ -270,7 +354,7 @@ def parse_tasks(tasks_root: Path) -> list[TaskInfo]:
         _scan_copybooks(entry, task)
 
         # JCL signals
-        _scan_jcl(entry, task)
+        _scan_jcl(entry, task, jcl_catalog)
 
         tasks.append(task)
 
