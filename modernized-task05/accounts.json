@@ -1,0 +1,17 @@
+{
+  "10001": {
+    "id": "10001",
+    "name": "IVAN IVANOV",
+    "balance": "1500.00"
+  },
+  "10002": {
+    "id": "10002",
+    "name": "PETR PETROV",
+    "balance": "400.50"
+  },
+  "10003": {
+    "id": "10003",
+    "name": "MARIA SIDOROVA",
+    "balance": "99.00"
+  }
+}
