@@ -44,6 +44,15 @@ was verified byte-for-byte against the original COBOL reference files.
 Screenshots of the Bob IDE task sessions used to build this project are in
 [`bob_sessions/`](bob_sessions/).
 
+## How Bob 2.0 was used (feature by feature)
+
+| Bob 2.0 capability | Where it was used | Evidence |
+|---|---|---|
+| **Agent mode** (autonomous multi-step planning) | Bob broke "modernize TASK05" down into a 10-step Todo List (read COBOL source → design folder structure → write `accounts.json` → `account_store.py` → `transaction_reader.py` → `processor.py` → `main.py` → README → smoke test) and executed every step without manual step-by-step prompting | [`bob_sessions/modernize_task05.png`](bob_sessions/modernize_task05.png) |
+| **Whole-repository context analysis** | Bob read and classified all 28 COBOL/JCL/VSAM/DB2 programs in a single session, grouping them into 9 technology patterns (VSAM KSDS Core, AIX & ESDS, GDG, Sequential-only, In-memory Table Lookup, DB2 cursor patterns, DB2 bulk/upsert/FK, multi-program CALL, DB2+VSAM hybrids) | [`bob_sessions/explore_and_build_knowledge_base.png`](bob_sessions/explore_and_build_knowledge_base.png), [`knowledge-base/INDEX.md`](knowledge-base/INDEX.md) |
+| **Self-correction / automated test generation** | While building the `cobol_knowledge_builder` classifier, Bob found and fixed 3 bugs in its own generated code, then wrote 18 pytest tests to guard against regressions | [`knowledge-base/test_pipeline.py`](knowledge-base/test_pipeline.py) — `18 passed in 0.05s` |
+| **Verified modernization / working prototype** | For the COBOL→Python rewrite of TASK05, Bob mapped COBOL constructs (`PIC 9(5)V99` implied decimal, `FILE STATUS '23'`, VSAM `READ`/`REWRITE`) to Python equivalents (`decimal.Decimal`, exception handling, a JSON-backed store) and validated the output byte-for-byte against the original COBOL reference files | [`modernized-task05/`](modernized-task05/) |
+
 ## What the rest of this repository is
 
 `TASKS/`, `JCL SAMPLES/`, and `JCLPROC/` are **not** part of the hackathon build. They are
