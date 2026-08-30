@@ -1,3 +1,61 @@
+# bob-cobol-modernizer
+
+**IBM TechXchange 2026 Pre-conference Dev Day Hackathon submission.** Team **dobeg**.
+Theme: *Build with purpose using IBM Bob 2.0*.
+
+---
+
+## The problem
+
+Mainframe teams have thousands of COBOL programs and almost no documentation. Understanding
+what one program does takes time. Understanding a whole codebase, and finding the patterns
+that repeat across dozens of programs, takes many hours of manual reading.
+
+This repo uses my own COBOL practice codebase (28 tasks with VSAM, JCL, and DB2) as a
+stand-in for that problem, and uses Bob to solve it.
+
+## What Bob built (the actual hackathon deliverable)
+
+### 1. [`knowledge-base/`](knowledge-base/) — automated COBOL documentation tool
+
+A Python tool (`cobol_knowledge_builder`) that scans the whole COBOL codebase below,
+classifies every program into one of 9 technology groups (VSAM KSDS, DB2 cursors, GDG,
+multi-program CALL, DB2+VSAM hybrids, and so on), and generates a `README.md` for every
+task plus a master [`INDEX.md`](knowledge-base/INDEX.md) with a Mermaid dependency diagram.
+Runs on all 28 tasks in under 0.2 seconds.
+
+While building the classifier, Bob found and fixed 3 real bugs in its own code, then wrote
+18 pytest tests so they don't come back. See [`knowledge-base/test_pipeline.py`](knowledge-base/test_pipeline.py).
+
+**Start here:** [`knowledge-base/INDEX.md`](knowledge-base/INDEX.md)
+
+### 2. [`modernized-task05/`](modernized-task05/) — a modernized COBOL program
+
+`knowledge-base` found that VSAM KSDS core operations is the most common pattern in the
+codebase. TASK05 (a banking transaction program) was picked as the representative example
+and modernized into Python, replacing VSAM with a JSON-backed store while keeping the exact
+same business logic (deposit, withdrawal, overdraft check, decimal arithmetic). The output
+was verified byte-for-byte against the original COBOL reference files.
+
+**Start here:** [`modernized-task05/README.md`](modernized-task05/README.md)
+
+### Bob session evidence
+
+Screenshots of the Bob IDE task sessions used to build this project are in
+[`bob_sessions/`](bob_sessions/).
+
+## What the rest of this repository is
+
+`TASKS/`, `JCL SAMPLES/`, and `JCLPROC/` are **not** part of the hackathon build. They are
+my personal COBOL/JCL/VSAM/DB2 practice codebase, written before the hackathon as I was
+studying IBM mainframe development. Bob used this codebase as its input dataset. The
+original description of that codebase is kept below for background.
+
+---
+
+<details>
+<summary><strong>Original "COBOL Practice Tasks" README (background on the source dataset, TASK05-TASK32)</strong></summary>
+
 COBOL practice tasks with DB2, JCL, and VSAM examples
 
 # COBOL Practice Tasks
@@ -436,3 +494,5 @@ Reads customer import data from a PS file using shared record layouts defined in
 ## Author
 
 Self-taught mainframe developer. All programs were written from scratch as practice exercises on IBM z/OS with Enterprise COBOL and DB2 for z/OS.
+
+</details>
